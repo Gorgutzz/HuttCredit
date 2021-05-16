@@ -59,3 +59,63 @@ class Blockchain
     {
         return this._nodes;
     }
+
+    set current_transactions(transactions)
+    {
+        this._current_transactions = transactions;
+    }
+
+    get current_transactions()
+    {
+        return this._current_transactions
+    }
+
+
+    new_block(proof,previous_hash = null)
+    {
+        var that = this;
+        var previous_index;
+        let time = new Date();
+        if (this.chain.length == 0)
+        {
+            previous_index = 0;
+        }
+        else{
+            previous_index = this.chain.length -1 ;
+        }
+        let block = new Block(that.chain.length+1, time, that.current_transactions, previous_hash || this.hash(this.chain[previous_index]));
+        console.log(block);
+
+        this.setCurrent_transactions = [];
+        this.chain.push(block);
+        return block;
+    }
+
+    last_block()
+    {
+        if (this.chain.length == 0)
+        {
+            return 0;
+        }
+        return this.chain[this.chain.length -1];
+    }
+
+    new_transaction(sender,recipient,amount)
+    {
+        this.current_transactions.push(
+            {
+                sender: sender,
+                amount: amount,
+                recipient : recipient
+        });
+        //return the index of the next block to be mined.
+        if (this.chain.length == 0)
+        {
+            return 1;
+        }
+        else
+        {
+            return this.chain[this.chain.length -1].index +1;
+        }
+        console.log (this.current_transactions);
+    }
