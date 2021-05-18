@@ -139,3 +139,30 @@ class Blockchain
         .digest('base64');
         return hash.startsWith('0000');
     }
+}
+
+ new_transaction(sender,recipient,amount)
+   {
+       this.current_transactions.push(
+           {
+               sender: sender,
+               amount: amount,
+               recipient : recipient
+       });
+       //return the index of the next block to be mined.
+       if (this.chain.length == 0)
+       {
+           return 1;
+       }
+       else
+       {
+           return this.chain[this.chain.length -1].index +1;
+       }
+
+       console.log (this.current_transactions);
+
+   }
+}
+
+var blockchain = new Blockchain();
+module.exports = blockchain;
