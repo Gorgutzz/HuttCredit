@@ -119,3 +119,23 @@ class Blockchain
         }
         console.log (this.current_transactions);
     }
+
+    proof_of_work(last_proof)
+    {
+        var proof = 0;
+        while(!this.valid_proof(last_proof, proof))
+        {
+            proof+=1;
+        }
+        console.log("Proof number found " + proof);
+        return proof;
+    }
+
+    valid_proof(last_proof,proof)
+    {
+        let guess = Buffer.from(proof.toString()).toString('base64') + Buffer.from(last_proof.toString()).toString('base64');
+        var hash = createHash.createHash('sha256')
+        .update(guess)
+        .digest('base64');
+        return hash.startsWith('0000');
+    }
