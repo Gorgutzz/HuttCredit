@@ -163,11 +163,59 @@ class Blockchain
 
    }
 
-register_node(address)
-{
-    var parsed_url = new URL(address); // URL documentation can be found at https://nodejs.org/api/url.html#url_the_whatwg_url_api
-    this._nodes.add(parsed_url);
-}
+  register_node(address)
+  {
+      var parsed_url = new URL(address); // URL documentation can be found at https://nodejs.org/api/url.html#url_the_whatwg_url_api
+      this._nodes.add(parsed_url);
+  }
+
+  valid_chain(chain_to_check)
+    {
+        var current_index = 1;
+        var last_block = chain_to_check[0];
+        while (current_index < chain_to_check.length)
+        {
+            var block = chain_to_check[current_index];
+            if (block.previous_hash != this.hash(block))
+            {
+                return false;
+            }
+            if (! this.valid_proof(last_block.proof, block.proof))
+            {
+                return false;
+            }
+            last_block = block;
+            current_index +=1;
+        }
+        return true;
+    }
+
+    resolve_conflicts()
+    {
+        var neighbours = this.nodes;
+        var that = this;
+        var new_chain = null;
+        var flag = 0;
+        var tmp_length = 0;
+        max_length = this.chain.length;
+        neighbours.forEach(node => {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                {
+                    var new_chain = JSON.parse(xmlHttp.responseText);
+                    if (that.valid_chain(new_chain)  && new_chain.length > max_length)
+                    {
+                        that._chain = new_chain;
+                        max_length = new_chain.length;
+                    }
+                }
+                };
+            xmlHttp.open("GET", node.origin + "/chain", true); // true for asynchronous
+            xmlHttp.send(null);
+        });
+
+    }
 
 }
 
