@@ -162,6 +162,13 @@ class Blockchain
        console.log (this.current_transactions);
 
    }
+
+register_node(address)
+{
+    var parsed_url = new URL(address); // URL documentation can be found at https://nodejs.org/api/url.html#url_the_whatwg_url_api
+    this._nodes.add(parsed_url);
+}
+
 }
 
 var blockchain = new Blockchain();
