@@ -70,106 +70,13 @@ class Blockchain
         return this._current_transactions
     }
 
-
-    new_block(proof,previous_hash = null)
+    register_node(address)
     {
-        var that = this;
-        var previous_index;
-        let time = new Date();
-        if (this.chain.length == 0)
-        {
-            previous_index = 0;
-        }
-        else{
-            previous_index = this.chain.length -1 ;
-        }
-        let block = new Block(that.chain.length+1, time, that.current_transactions, previous_hash || this.hash(this.chain[previous_index]));
-        console.log(block);
-
-        this.setCurrent_transactions = [];
-        this.chain.push(block);
-        return block;
+        var parsed_url = new URL(address); // URL documentation can be found at https://nodejs.org/api/url.html#url_the_whatwg_url_api
+        this._nodes.add(parsed_url);
     }
 
-    last_block()
-    {
-        if (this.chain.length == 0)
-        {
-            return 0;
-        }
-        return this.chain[this.chain.length -1];
-    }
-
-    new_transaction(sender,recipient,amount)
-    {
-        this.current_transactions.push(
-            {
-                sender: sender,
-                amount: amount,
-                recipient : recipient
-        });
-        //return the index of the next block to be mined.
-        if (this.chain.length == 0)
-        {
-            return 1;
-        }
-        else
-        {
-            return this.chain[this.chain.length -1].index +1;
-        }
-        console.log (this.current_transactions);
-    }
-
-    proof_of_work(last_proof)
-    {
-        var proof = 0;
-        while(!this.valid_proof(last_proof, proof))
-        {
-            proof+=1;
-        }
-        console.log("Proof number found " + proof);
-        return proof;
-    }
-
-    valid_proof(last_proof,proof)
-    {
-        let guess = Buffer.from(proof.toString()).toString('base64') + Buffer.from(last_proof.toString()).toString('base64');
-        var hash = createHash.createHash('sha256')
-        .update(guess)
-        .digest('base64');
-        return hash.startsWith('0000');
-    }
-}
-
- new_transaction(sender,recipient,amount)
-   {
-       this.current_transactions.push(
-           {
-               sender: sender,
-               amount: amount,
-               recipient : recipient
-       });
-       //return the index of the next block to be mined.
-       if (this.chain.length == 0)
-       {
-           return 1;
-       }
-       else
-       {
-           return this.chain[this.chain.length -1].index +1;
-       }
-
-       console.log (this.current_transactions);
-
-   }
-
-  register_node(address)
-  {
-      var parsed_url = new URL(address); // URL documentation can be found at https://nodejs.org/api/url.html#url_the_whatwg_url_api
-      this._nodes.add(parsed_url);
-  }
-
-  valid_chain(chain_to_check)
+    valid_chain(chain_to_check)
     {
         var current_index = 1;
         var last_block = chain_to_check[0];
@@ -217,6 +124,89 @@ class Blockchain
 
     }
 
+    new_block(proof,previous_hash = null)
+    {
+        var that = this;
+        var previous_index;
+
+        let time = new Date();
+        if (this.chain.length == 0)
+        {
+            previous_index = 0;
+        }
+        else{
+            previous_index = this.chain.length -1 ;
+        }
+        let block = new Block(that.chain.length+1, time, that.current_transactions, previous_hash || this.hash(this.chain[previous_index]));
+        console.log(block);
+        //Reset the current list of transactions
+        this.setCurrent_transactions = [];
+        this.chain.push(block);
+        return block;
+    }
+
+    last_block()
+    {
+        if (this.chain.length == 0)
+        {
+            return 0;
+        }
+        return this.chain[this.chain.length -1];
+    }
+
+    proof_of_work(last_proof)
+    {
+        var proof = 0;
+        while(!this.valid_proof(last_proof, proof))
+        {
+            proof+=1;
+        }
+        console.log("Proof number found " + proof);
+        return proof;
+    }
+
+    valid_proof(last_proof,proof)
+    {
+        let guess = Buffer.from(proof.toString()).toString('base64') + Buffer.from(last_proof.toString()).toString('base64');
+        var hash = createHash.createHash('sha256')
+        .update(guess)
+        .digest('base64');
+        return hash.startsWith('0000');
+    }
+
+    hash(block)
+    {
+        let block_string = JSON.stringify(block);
+        console.log("block " + block_string);
+        let base64_string = Buffer.from(block_string.toString()).toString("base64");
+        var hash = createHash.createHash('sha256')
+        .update(base64_string)
+        .digest('base64');
+        console.log("Creating Hash " + hash);
+        return hash;
+    }
+
+    new_transaction(sender,recipient,amount)
+    {
+        this.current_transactions.push(
+            {
+                sender: sender,
+                amount: amount,
+                recipient : recipient
+        });
+        //return the index of the next block to be mined.
+        if (this.chain.length == 0)
+        {
+            return 1;
+        }
+        else
+        {
+            return this.chain[this.chain.length -1].index +1;
+        }
+
+        console.log (this.current_transactions);
+
+    }
 }
 
 var blockchain = new Blockchain();

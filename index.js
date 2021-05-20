@@ -1,3 +1,4 @@
+"use strict";
 var express=require('express');
 var app=express();
 const Blockchain = require("./blockchain");
@@ -50,13 +51,6 @@ app.post('/transactions/new',function (req,res){
     res.send("Transaction will be added to block " + index);
 });
 
-var myArgs = process.argv.slice(2)[0];
-console.log('Launching bitnode in port: ', myArgs);
-
-var server = app.listen(myArgs,function(){
-
-});
-
 app.post('/nodes/register',function (req,res){
     var nodes = req.query.nodes;
     if (nodes === "")
@@ -72,4 +66,11 @@ app.post('/nodes/register',function (req,res){
 app.get('/nodes/resolve',function (req,res){
     var replaced = Blockchain.resolve_conflicts();
     res.send(JSON.stringify(Blockchain));
+});
+
+var myArgs = process.argv.slice(2)[0];
+console.log('Launching bitnode in port: ', myArgs);
+
+var server = app.listen(myArgs,function(){
+
 });
