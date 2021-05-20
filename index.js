@@ -56,3 +56,20 @@ console.log('Launching bitnode in port: ', myArgs);
 var server = app.listen(myArgs,function(){
 
 });
+
+app.post('/nodes/register',function (req,res){
+    var nodes = req.query.nodes;
+    if (nodes === "")
+    {
+        res.send("Provide a list of nodes or leave me alone");
+    }
+    nodes.forEach(element => {
+        Blockchain.register_node(element);
+    });
+    res.send("Nodes will be added to the block ");
+});
+
+app.get('/nodes/resolve',function (req,res){
+    var replaced = Blockchain.resolve_conflicts();
+    res.send(JSON.stringify(Blockchain));
+});
